@@ -16,11 +16,11 @@ export default async (req, context) => {
 
   const { participants, field } = await req.json()
 
-  if (!participants || participants.length !== 13) {
-    return new Response('Need exactly 13 participants', { status: 400 })
+  if (!participants || participants.length !== 10) {
+    return new Response('Need exactly 10 participants', { status: 400 })
   }
 
-  const draftOrder = shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+  const draftOrder = shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
 
   const state = {
     status: 'drafting',

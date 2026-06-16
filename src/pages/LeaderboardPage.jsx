@@ -85,7 +85,7 @@ export default function LeaderboardPage() {
     return a.total - b.total
   })
 
-  const draftComplete = state.status === 'complete' || state.picks.length >= 52
+  const draftComplete = state.status === 'complete' || state.picks.length >= 40
 
   return (
     <div className="page leaderboard-page">
@@ -106,7 +106,7 @@ export default function LeaderboardPage() {
             </span>
           )}
           {!draftComplete && (
-            <span className="tag">{state.picks.length}/52 picks made</span>
+            <span className="tag">{state.picks.length}/40 picks made</span>
           )}
           {lastUpdated && (
             <span className="tag muted">

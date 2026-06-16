@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { ODDS } from '../odds'
 
-const TOTAL_PICKS = 52
-const NUM_PARTICIPANTS = 13
+const TOTAL_PICKS = 40
+const NUM_PARTICIPANTS = 10
 
 // Always derive the field from the static odds — never from the blob
 const STATIC_FIELD = Object.keys(ODDS).map((name) => ({

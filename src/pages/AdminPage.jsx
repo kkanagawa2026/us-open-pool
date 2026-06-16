@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { ODDS } from '../odds'
 
-const EMPTY_PARTICIPANTS = Array(13).fill('')
+const EMPTY_PARTICIPANTS = Array(10).fill('')
 
 // Build the draft field from our static odds — one entry per player
 const STATIC_FIELD = Object.keys(ODDS).map((name) => ({
@@ -35,10 +35,10 @@ export default function AdminPage() {
   async function handleSetup() {
     const names = participants.map((n) => n.trim())
     if (names.some((n) => !n)) {
-      setMessage('All 13 participant names are required.')
+      setMessage('All 10 participant names are required.')
       return
     }
-    if (new Set(names).size !== 13) {
+    if (new Set(names).size !== 10) {
       setMessage('All names must be unique.')
       return
     }
@@ -89,7 +89,7 @@ export default function AdminPage() {
         <div className="info-box">
           <div>
             <strong>Draft {state.status === 'complete' ? 'complete' : 'active'}</strong>
-            {' — '}{state.picks.length}/52 picks made
+            {' — '}{state.picks.length}/40 picks made
           </div>
           <button className="btn-danger" onClick={handleReset}>Reset Draft</button>
         </div>
@@ -109,8 +109,8 @@ export default function AdminPage() {
       )}
 
       <section className="form-section">
-        <h3>Participants (13)</h3>
-        <p className="muted">Enter all 13 names before initializing.</p>
+        <h3>Participants (10)</h3>
+        <p className="muted">Enter all 10 names before initializing.</p>
         <div className="participant-grid">
           {participants.map((name, i) => (
             <div key={i} className="participant-row">
@@ -143,7 +143,7 @@ export default function AdminPage() {
       {draftActive && (
         <section className="form-section">
           <h3>Snake Draft Order</h3>
-          <p className="muted">Rounds 2 and 4 go in reverse. 52 total picks.</p>
+          <p className="muted">Rounds 2 and 4 go in reverse. 40 total picks.</p>
           <div className="draft-order-table">
             <div className="order-header">
               <span>#</span>
@@ -158,9 +158,9 @@ export default function AdminPage() {
                 <span className="slot-num">#{slot + 1}</span>
                 <span>{state.participants[pIdx]}</span>
                 <span className="pick-num">#{slot + 1}</span>
-                <span className="pick-num">#{13 + (12 - slot) + 1}</span>
-                <span className="pick-num">#{26 + slot + 1}</span>
-                <span className="pick-num">#{39 + (12 - slot) + 1}</span>
+                <span className="pick-num">#{10 + (9 - slot) + 1}</span>
+                <span className="pick-num">#{20 + slot + 1}</span>
+                <span className="pick-num">#{30 + (9 - slot) + 1}</span>
               </div>
             ))}
           </div>

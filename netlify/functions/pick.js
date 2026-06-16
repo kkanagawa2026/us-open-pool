@@ -1,9 +1,9 @@
 import { getStore } from '@netlify/blobs'
 
 function getSlotParticipantIndex(slotIndex, draftOrder) {
-  const round = Math.floor(slotIndex / 13)
-  const posInRound = slotIndex % 13
-  const orderIndex = round % 2 === 0 ? posInRound : 12 - posInRound
+  const round = Math.floor(slotIndex / 10)
+  const posInRound = slotIndex % 10
+  const orderIndex = round % 2 === 0 ? posInRound : 9 - posInRound
   return draftOrder[orderIndex]
 }
 
@@ -21,7 +21,7 @@ export default async (req, context) => {
     return new Response('Draft is not active', { status: 400 })
   }
 
-  if (state.picks.length >= 52) {
+  if (state.picks.length >= 40) {
     return new Response('Draft is complete', { status: 400 })
   }
 
@@ -50,7 +50,7 @@ export default async (req, context) => {
     timestamp: new Date().toISOString(),
   })
 
-  if (state.picks.length === 52) {
+  if (state.picks.length === 40) {
     state.status = 'complete'
   }
 
