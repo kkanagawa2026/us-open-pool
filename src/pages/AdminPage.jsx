@@ -1,17 +1,22 @@
 import { useState, useEffect } from 'react'
+import { ODDS } from '../odds'
 
 const EMPTY_PARTICIPANTS = Array(13).fill('')
 
+// Build the draft field from our static odds — one entry per player
+const STATIC_FIELD = Object.keys(ODDS).map((name) => ({
+  id: name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  name,
+}))
+
 export default function AdminPage() {
   const [participants, setParticipants] = useState(EMPTY_PARTICIPANTS)
-  const [golferInfo, setGolferInfo] = useState({ golfers: [], eventName: '' })
   const [state, setState] = useState(null)
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     fetchState()
-    fetchGolfers()
   }, [])
 
   async function fetchState() {
@@ -19,12 +24,6 @@ export default function AdminPage() {
     const data = await res.json()
     setState(data)
     if (data.participants) setParticipants(data.participants)
-  }
-
-  async function fetchGolfers() {
-    const res = await fetch('/api/golfers')
-    const data = await res.json()
-    setGolferInfo(data)
   }
 
   function setParticipant(index, value) {
@@ -48,7 +47,7 @@ export default function AdminPage() {
     const res = await fetch('/api/setup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ participants: names, field: golferInfo.golfers }),
+      body: JSON.stringify({ participants: names, field: STATIC_FIELD }),
     })
     const data = await res.json()
     setState(data)
@@ -129,12 +128,8 @@ export default function AdminPage() {
 
       <section className="form-section">
         <h3>Golf Field</h3>
-        {golferInfo.eventName && <p className="event-label">{golferInfo.eventName}</p>}
-        {golferInfo.golfers.length === 0 ? (
-          <p className="muted">Fetching player field from ESPN…</p>
-        ) : (
-          <p className="muted">{golferInfo.golfers.length} players loaded from ESPN</p>
-        )}
+        <p className="event-label">2026 U.S. Open — Shinnecock Hills</p>
+        <p className="muted">{STATIC_FIELD.length} players · sorted by Vegas odds in the draft room</p>
       </section>
 
       {!draftActive && (
