@@ -4,6 +4,13 @@ import { ODDS } from '../odds'
 const TOTAL_PICKS = 52
 const NUM_PARTICIPANTS = 13
 
+// Always derive the field from the static odds — never from the blob
+const STATIC_FIELD = Object.keys(ODDS).map((name) => ({
+  id: name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+  name,
+  odds: ODDS[name],
+}))
+
 function getSlotInfo(slotIndex, draftOrder, participants) {
   const round = Math.floor(slotIndex / NUM_PARTICIPANTS)
   const posInRound = slotIndex % NUM_PARTICIPANTS
@@ -102,11 +109,11 @@ export default function DraftPage() {
 
   const pickedIds = new Set(state.picks.map((p) => p.playerId))
 
-  // Merge odds into field, mark drafted
-  const allPlayers = (state.field || []).map((g) => {
-    const odds = ODDS[g.name] ?? null
-    return { ...g, odds, isDrafted: pickedIds.has(g.id) }
-  })
+  // Use static field — always current regardless of when draft was initialized
+  const allPlayers = STATIC_FIELD.map((g) => ({
+    ...g,
+    isDrafted: pickedIds.has(g.id),
+  }))
 
   // Sort: available players sorted by choice, drafted players at bottom
   const available = allPlayers.filter((g) => !g.isDrafted)
