@@ -31,7 +31,6 @@ export default function LeaderboardPage() {
     setEventName(golfersData.eventName ?? '')
     setEventStatus(golfersData.eventStatus ?? '')
 
-    // Index by both id and name for robust matching
     const index = {}
     for (const g of golfersData.golfers ?? []) {
       index[g.id] = g
@@ -56,6 +55,7 @@ export default function LeaderboardPage() {
     return (
       <div className="page">
         <div className="empty-state">
+          <div className="empty-icon">⛳</div>
           <p>Pool hasn't been set up yet.</p>
           <a href="#admin" className="btn-primary">Admin Setup</a>
         </div>
@@ -66,9 +66,8 @@ export default function LeaderboardPage() {
   const tournamentLive = eventStatus === 'STATUS_IN_PROGRESS' ||
     Object.values(golfers).some((g) => g.scoreValue !== 0)
 
-  // Build participant summaries
-  const summaries = state.participants.map((name, index) => {
-    const picks = state.picks.filter((p) => p.participantIndex === index)
+  const summaries = state.participants.map((name, idx) => {
+    const picks = state.picks.filter((p) => p.participantIndex === idx)
     let total = 0
     const players = picks.map((pick) => {
       const live = golfers[pick.playerId] ?? golfers[pick.playerName] ?? null
@@ -86,45 +85,58 @@ export default function LeaderboardPage() {
     return a.total - b.total
   })
 
-  const draftComplete = state.status === 'complete' || state.picks.length >= 48
+  const draftComplete = state.status === 'complete' || state.picks.length >= 52
 
   return (
     <div className="page leaderboard-page">
-      <div className="lb-meta">
-        <div>
-          {eventName && <span className="event-name">{eventName}</span>}
-          {!draftComplete && (
-            <span className="muted"> · Draft in progress ({state.picks.length}/48 picks)</span>
+
+      <div className="lb-hero">
+        <h1>
+          <span className="lb-hero-main">Overall</span>{' '}
+          <span className="lb-hero-accent">Leaderboard</span>
+        </h1>
+        <p className="lb-hero-sub">
+          {eventName || 'US Open 2026'} · Lowest score takes the crown
+        </p>
+        <div className="lb-meta-row">
+          {tournamentLive && (
+            <span className="live-badge">
+              <span className="live-dot" />
+              LIVE
+            </span>
           )}
-          {draftComplete && !tournamentLive && (
-            <span className="muted"> · Tournament hasn't started yet</span>
+          {!draftComplete && (
+            <span className="tag">{state.picks.length}/52 picks made</span>
+          )}
+          {lastUpdated && (
+            <span className="tag muted">
+              Updated {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </span>
           )}
         </div>
-        {lastUpdated && (
-          <span className="last-updated">
-            Live scores refresh every 60s · Last: {lastUpdated.toLocaleTimeString()}
-          </span>
-        )}
       </div>
 
-      <div className="lb-list">
+      <div className="lb-table">
+        <div className="lb-table-header">
+          <span>Rank</span>
+          <span>Team</span>
+          <span className="col-right">Score</span>
+        </div>
+
         {summaries.map((participant, rank) => (
           <div key={participant.name} className="lb-card">
             <div className="lb-card-header">
-              <div className="lb-rank-name">
-                <span className="lb-rank">#{rank + 1}</span>
-                <span className="lb-participant-name">{participant.name}</span>
-              </div>
-              <div className="lb-card-right">
-                {tournamentLive && participant.pickCount > 0 && (
-                  <span className={`lb-total ${scoreClass(participant.total)}`}>
-                    {formatScore(participant.total)}
-                  </span>
-                )}
-                {!tournamentLive && (
-                  <span className="muted">{participant.pickCount}/4 picks</span>
-                )}
-              </div>
+              <span className={`lb-rank ${rank < 3 ? 'lb-rank-top' : ''}`}>
+                {rank === 0 ? '🥇' : rank === 1 ? '🥈' : rank === 2 ? '🥉' : `#${rank + 1}`}
+              </span>
+              <span className="lb-participant-name">{participant.name}</span>
+              <span className={`lb-total ${scoreClass(participant.total)}`}>
+                {tournamentLive && participant.pickCount > 0
+                  ? formatScore(participant.total)
+                  : participant.pickCount > 0
+                  ? `${participant.pickCount}/4`
+                  : '—'}
+              </span>
             </div>
 
             {participant.players.length > 0 && (
@@ -145,7 +157,7 @@ export default function LeaderboardPage() {
                         )}
                       </div>
                     ) : (
-                      <span className="muted lb-no-score">–</span>
+                      <span className="muted">–</span>
                     )}
                   </div>
                 ))}

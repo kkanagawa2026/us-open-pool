@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-const EMPTY_PARTICIPANTS = Array(12).fill('')
+const EMPTY_PARTICIPANTS = Array(13).fill('')
 
 export default function AdminPage() {
   const [participants, setParticipants] = useState(EMPTY_PARTICIPANTS)
@@ -36,10 +36,10 @@ export default function AdminPage() {
   async function handleSetup() {
     const names = participants.map((n) => n.trim())
     if (names.some((n) => !n)) {
-      setMessage('All 12 participant names are required.')
+      setMessage('All 13 participant names are required.')
       return
     }
-    if (new Set(names).size !== 12) {
+    if (new Set(names).size !== 13) {
       setMessage('All names must be unique.')
       return
     }
@@ -52,7 +52,7 @@ export default function AdminPage() {
     })
     const data = await res.json()
     setState(data)
-    setMessage('Draft initialized! Share the Draft Room link with all participants.')
+    setMessage('Draft initialized! Share the Draft link with all participants.')
     setLoading(false)
   }
 
@@ -90,15 +90,12 @@ export default function AdminPage() {
         <div className="info-box">
           <div>
             <strong>Draft {state.status === 'complete' ? 'complete' : 'active'}</strong>
-            {' — '}{state.picks.length}/48 picks made
+            {' — '}{state.picks.length}/52 picks made
           </div>
-          <button className="btn-danger" onClick={handleReset}>
-            Reset Draft
-          </button>
+          <button className="btn-danger" onClick={handleReset}>Reset Draft</button>
         </div>
       )}
 
-      {/* Undo last pick */}
       {lastPick && (
         <div className="undo-box">
           <div className="undo-info">
@@ -108,15 +105,13 @@ export default function AdminPage() {
               <span className="muted"> by {lastPick.participantName}</span>
             </span>
           </div>
-          <button className="btn-undo" onClick={handleUndoPick}>
-            Undo This Pick
-          </button>
+          <button className="btn-undo" onClick={handleUndoPick}>Undo This Pick</button>
         </div>
       )}
 
       <section className="form-section">
-        <h3>Participants</h3>
-        <p className="muted">Enter all 12 names before initializing.</p>
+        <h3>Participants (13)</h3>
+        <p className="muted">Enter all 13 names before initializing.</p>
         <div className="participant-grid">
           {participants.map((name, i) => (
             <div key={i} className="participant-row">
@@ -134,9 +129,7 @@ export default function AdminPage() {
 
       <section className="form-section">
         <h3>Golf Field</h3>
-        {golferInfo.eventName && (
-          <p className="event-label">{golferInfo.eventName}</p>
-        )}
+        {golferInfo.eventName && <p className="event-label">{golferInfo.eventName}</p>}
         {golferInfo.golfers.length === 0 ? (
           <p className="muted">Fetching player field from ESPN…</p>
         ) : (
@@ -155,24 +148,24 @@ export default function AdminPage() {
       {draftActive && (
         <section className="form-section">
           <h3>Snake Draft Order</h3>
-          <p className="muted">Round 2 and 4 go in reverse order.</p>
+          <p className="muted">Rounds 2 and 4 go in reverse. 52 total picks.</p>
           <div className="draft-order-table">
             <div className="order-header">
-              <span>Slot</span>
+              <span>#</span>
               <span>Participant</span>
-              <span>Round 1</span>
-              <span>Round 2</span>
-              <span>Round 3</span>
-              <span>Round 4</span>
+              <span>R1</span>
+              <span>R2</span>
+              <span>R3</span>
+              <span>R4</span>
             </div>
             {state.draftOrder.map((pIdx, slot) => (
               <div key={slot} className="order-row">
                 <span className="slot-num">#{slot + 1}</span>
                 <span>{state.participants[pIdx]}</span>
                 <span className="pick-num">#{slot + 1}</span>
-                <span className="pick-num">#{12 + (11 - slot) + 1}</span>
-                <span className="pick-num">#{24 + slot + 1}</span>
-                <span className="pick-num">#{36 + (11 - slot) + 1}</span>
+                <span className="pick-num">#{13 + (12 - slot) + 1}</span>
+                <span className="pick-num">#{26 + slot + 1}</span>
+                <span className="pick-num">#{39 + (12 - slot) + 1}</span>
               </div>
             ))}
           </div>

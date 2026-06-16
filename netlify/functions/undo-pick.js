@@ -17,7 +17,6 @@ export default async (req, context) => {
   }
 
   const removed = state.picks.pop()
-  // Restore to drafting if we just undid the last pick that completed the draft
   if (state.status === 'complete') {
     state.status = 'drafting'
   }

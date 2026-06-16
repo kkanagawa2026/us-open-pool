@@ -17,15 +17,18 @@ export default function App() {
       <header>
         <div className="header-inner">
           <div className="site-title">
-            <span className="flag">⛳</span>
-            <span>US Open Pool 2026</span>
+            <span className="site-flag">⛳</span>
+            <div>
+              <div className="site-name">US Open Pool</div>
+              <div className="site-year">Shinnecock Hills · 2026</div>
+            </div>
           </div>
           <nav>
             <a href="#leaderboard" className={page === '#leaderboard' ? 'active' : ''}>
-              Leaderboard
+              Standings
             </a>
             <a href="#draft" className={page === '#draft' ? 'active' : ''}>
-              Draft Room
+              Draft
             </a>
             <a href="#admin" className={page === '#admin' ? 'active' : ''}>
               Admin
