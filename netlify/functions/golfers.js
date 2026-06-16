@@ -22,6 +22,7 @@ export default async (req, context) => {
       const rounds = (c.linescores ?? []).map((l) =>
         l.displayValue != null ? l.displayValue : l.value != null ? String(l.value) : '-'
       )
+      const statusName = c.status?.type?.name ?? ''
       return {
         id: c.athlete?.id ?? c.id ?? String(Math.random()),
         name: c.athlete?.displayName ?? 'Unknown',
@@ -31,16 +32,20 @@ export default async (req, context) => {
         scoreValue: typeof c.score?.value === 'number' ? c.score.value : 0,
         position: c.status?.position?.displayName ?? '-',
         thru: c.status?.type?.shortDetail ?? c.status?.type?.detail ?? '',
-        statusName: c.status?.type?.name ?? '',
+        statusName,
+        missedCut: statusName === 'STATUS_CUT' || statusName === 'STATUS_MISSED_CUT',
         rounds,
       }
     })
     .sort((a, b) => a.scoreValue - b.scoreValue)
 
+  const currentRound = Math.max(0, ...competitors.map((c) => c.linescores?.length ?? 0))
+
   return Response.json({
     golfers,
     eventName: event.name ?? null,
     eventStatus: event.competitions?.[0]?.status?.type?.name ?? '',
+    currentRound,
   })
 }
 

@@ -749,6 +749,16 @@ nav a.active {
   gap: 12px;
 }
 .lb-player-row:last-child { border-bottom: none; }
+.lb-player-row.cut { opacity: 0.55; }
+.cut-badge {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #fff;
+  background: var(--red);
+  border-radius: 3px;
+  padding: 2px 5px;
+}
 
 .lb-player-name { font-weight: 600; flex: 1; }
 .lb-player-stats {

@@ -16,6 +16,7 @@ export default function LeaderboardPage() {
   const [golfers, setGolfers] = useState({})
   const [eventName, setEventName] = useState('')
   const [eventStatus, setEventStatus] = useState('')
+  const [currentRound, setCurrentRound] = useState(0)
   const [lastUpdated, setLastUpdated] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -30,6 +31,7 @@ export default function LeaderboardPage() {
     setState(stateData)
     setEventName(golfersData.eventName ?? '')
     setEventStatus(golfersData.eventStatus ?? '')
+    setCurrentRound(golfersData.currentRound ?? 0)
 
     const index = {}
     for (const g of golfersData.golfers ?? []) {
@@ -66,13 +68,17 @@ export default function LeaderboardPage() {
   const tournamentLive = eventStatus === 'STATUS_IN_PROGRESS' ||
     Object.values(golfers).some((g) => g.scoreValue !== 0)
 
+  const weekendStarted = currentRound >= 3
+
   const summaries = state.participants.map((name, idx) => {
     const picks = state.picks.filter((p) => p.participantIndex === idx)
     let total = 0
     const players = picks.map((pick) => {
       const live = golfers[pick.playerId] ?? golfers[pick.playerName] ?? null
-      if (live) total += live.scoreValue
-      return { pick, live }
+      const missedCut = weekendStarted && live?.missedCut
+      const scoreContribution = missedCut ? 10 : (live?.scoreValue ?? 0)
+      if (live) total += scoreContribution
+      return { pick, live, missedCut, scoreContribution }
     })
     return { name, players, total, pickCount: picks.length }
   })
@@ -141,19 +147,28 @@ export default function LeaderboardPage() {
 
             {participant.players.length > 0 && (
               <div className="lb-players">
-                {participant.players.map(({ pick, live }) => (
-                  <div key={pick.playerId} className="lb-player-row">
+                {participant.players.map(({ pick, live, missedCut, scoreContribution }) => (
+                  <div key={pick.playerId} className={`lb-player-row${missedCut ? ' cut' : ''}`}>
                     <span className="lb-player-name">{pick.playerName}</span>
                     {live ? (
                       <div className="lb-player-stats">
-                        {live.position && live.position !== '-' && (
-                          <span className="lb-pos">T{live.position}</span>
-                        )}
-                        <span className={`lb-score ${scoreClass(live.scoreValue)}`}>
-                          {formatScore(live.scoreValue)}
-                        </span>
-                        {live.thru && (
-                          <span className="lb-thru">{live.thru}</span>
+                        {missedCut ? (
+                          <>
+                            <span className="cut-badge">CUT</span>
+                            <span className="lb-score over">+10</span>
+                          </>
+                        ) : (
+                          <>
+                            {live.position && live.position !== '-' && (
+                              <span className="lb-pos">T{live.position}</span>
+                            )}
+                            <span className={`lb-score ${scoreClass(live.scoreValue)}`}>
+                              {formatScore(live.scoreValue)}
+                            </span>
+                            {live.thru && (
+                              <span className="lb-thru">{live.thru}</span>
+                            )}
+                          </>
                         )}
                       </div>
                     ) : (
