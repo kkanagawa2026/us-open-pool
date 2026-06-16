@@ -96,7 +96,7 @@ export default function LeaderboardPage() {
           <span className="lb-hero-accent">Leaderboard</span>
         </h1>
         <p className="lb-hero-sub">
-          {eventName || 'US Open 2026'} · Lowest score takes the crown
+          2026 U.S. Open · Shinnecock Hills · Lowest score takes the crown
         </p>
         <div className="lb-meta-row">
           {tournamentLive && (
