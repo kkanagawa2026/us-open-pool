@@ -1,3 +1,10 @@
+function parseRoundScore(displayValue) {
+  if (!displayValue || displayValue === '-' || displayValue === '') return null
+  if (displayValue === 'E') return 0
+  const n = parseInt(displayValue, 10)
+  return isNaN(n) ? null : n
+}
+
 export default async (req, context) => {
   let data
   try {
@@ -19,27 +26,40 @@ export default async (req, context) => {
 
   const golfers = competitors
     .map((c) => {
-      const rounds = (c.linescores ?? []).map((l) =>
-        l.displayValue != null ? l.displayValue : l.value != null ? String(l.value) : '-'
-      )
+      // Per-round scores: linescore.displayValue contains the to-par score for each round
+      // e.g. '+3', 'E', '-2'. linescore.value is an ESPN internal tracking number.
+      const rawLinescores = c.linescores ?? []
+      const roundScores = rawLinescores.slice(0, 4).map((l) => parseRoundScore(l.displayValue))
+      while (roundScores.length < 4) roundScores.push(null)
+
+      const scoreValue = roundScores.reduce((sum, r) => sum + (r ?? 0), 0)
       const statusName = c.status?.type?.name ?? ''
+
       return {
         id: c.athlete?.id ?? c.id ?? String(Math.random()),
         name: c.athlete?.displayName ?? 'Unknown',
         shortName: c.athlete?.shortName ?? '',
         country: c.athlete?.flag?.alt ?? c.athlete?.country ?? '',
-        score: c.score?.displayValue ?? 'E',
-        scoreValue: typeof c.score?.value === 'number' ? c.score.value : 0,
+        scoreValue,
+        roundScores,
         position: c.status?.position?.displayName ?? '-',
         thru: c.status?.type?.shortDetail ?? c.status?.type?.detail ?? '',
         statusName,
         missedCut: statusName === 'STATUS_CUT' || statusName === 'STATUS_MISSED_CUT',
-        rounds,
       }
     })
     .sort((a, b) => a.scoreValue - b.scoreValue)
 
-  const currentRound = Math.max(0, ...competitors.map((c) => c.linescores?.length ?? 0))
+  // currentRound = highest round index that has data for any player
+  let currentRound = 0
+  for (const g of golfers) {
+    for (let r = 3; r >= 0; r--) {
+      if (g.roundScores[r] !== null) {
+        if (r + 1 > currentRound) currentRound = r + 1
+        break
+      }
+    }
+  }
 
   return Response.json({
     golfers,
