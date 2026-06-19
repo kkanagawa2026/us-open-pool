@@ -4,7 +4,7 @@ const ROUND_LABELS = ['R1', 'R2', 'R3', 'R4']
 const CUT_PENALTY = 10
 
 function normalizeName(name) {
-  return name.normalize('NFD').replace(/̀-ͯ/g, '').toLowerCase()
+  return name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
 }
 
 function formatScore(val) {
