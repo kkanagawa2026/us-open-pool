@@ -3,6 +3,10 @@ import { useState, useEffect } from 'react'
 const ROUND_LABELS = ['R1', 'R2', 'R3', 'R4']
 const CUT_PENALTY = 10
 
+function normalizeName(name) {
+  return name.normalize('NFD').replace(/̀-ͯ/g, '').toLowerCase()
+}
+
 function formatScore(val) {
   if (val === null || val === undefined) return '—'
   if (val === 0) return 'E'
@@ -40,6 +44,7 @@ export default function LeaderboardPage() {
     for (const g of golfersData.golfers ?? []) {
       index[g.id] = g
       index[g.name] = g
+      index[normalizeName(g.name)] = g
     }
     setGolfers(index)
     setLastUpdated(new Date())
@@ -78,7 +83,7 @@ export default function LeaderboardPage() {
     const picks = state.picks.filter((p) => p.participantIndex === idx)
 
     const players = picks.map((pick) => {
-      const live = golfers[pick.playerId] ?? golfers[pick.playerName] ?? null
+      const live = golfers[pick.playerId] ?? golfers[pick.playerName] ?? golfers[normalizeName(pick.playerName)] ?? null
       const missedCut = weekendStarted && (live?.missedCut ?? false)
 
       // Per-round scores: use actual round scores; cut players get null for R3/R4
